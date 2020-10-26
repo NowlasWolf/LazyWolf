@@ -7,6 +7,7 @@
 #include<stdio.h>
 #include<unistd.h>
 #include<cstring>
+#include<condition_variable>
 
 struct modDimensions{
   int y_size, x_size, y, x;
@@ -15,11 +16,15 @@ struct modDimensions{
 
 class LazyModule{
     protected:
+        char buf[1024];
+        std::mutex mlock;
+        std::condition_variable cv;
         WINDOW* win;
         int x, y, x_size, y_size;
         char name[11];
         bool inFocus = false;
         bool stopped = false;
+        bool ready = false;
         std::thread process;
 
         virtual void program(){
@@ -88,8 +93,18 @@ class LazyModule{
 class TestMod : public LazyModule{
     protected:
         void program(){
-            wprintw(win,"Test module started\n");
+            wprintw(win,"Test banana started\n");
             wrefresh(win);
+            while(!stopped){
+                char progbuf[1024];
+                std::unique_lock<std::mutex> lk(mlock);
+                cv.wait(lk, [this]{return ready;});
+                strncpy(progbuf, buf, 1024);
+                ready = false;
+                lk.unlock();
+                wprintw(win, ">%s",progbuf);
+                if(inFocus) wrefresh(win);
+            }
         }
     public:
         TestMod(modDimensions d)
@@ -103,12 +118,13 @@ class TestMod : public LazyModule{
             strncpy(name, "TestMod", 10);
             
         }
-
         void sendModInput(char* buffer){
-            wprintw(win, ">%s\n",buffer);
-        }
-        char* getName(){
-            return name;
+            std::unique_lock<std::mutex> lk(mlock);
+            strncpy(buf,buffer,1024);
+            ready = true;
+            mlock.unlock();
+            cv.notify_one();
+
         }
 };
 

@@ -16,9 +16,6 @@
 
 class LurkWolf : public LazyModule{
     protected:
-        std::mutex mlock;
-        char buf[1024];
-
         WINDOW *header;
 	    WINDOW *log;
 	    WINDOW *pstatus;

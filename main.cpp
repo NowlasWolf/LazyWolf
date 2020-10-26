@@ -44,7 +44,7 @@ int main(){
 
     struct lwItems items = {&modules, header, input, status, &modfocus};
 
-    loadModual(new LazyModule(modxy), items);
+    loadModule(new LazyModule(modxy), items);
     updateHeader(header, modules, modfocus);
     
     /*MAIN LOOP*/
@@ -73,15 +73,15 @@ int main(){
                 }
 
             }else if(!strcmp(buf,":count")){
-                loadModual(new CountMod(modxy), items);
+                loadModule(new CountMod(modxy), items);
                 modfocus = changeFocus(modules, modfocus, modules.size()-1);
                 
 
             }else if(!strcmp(buf,":test")){
-                loadModual(new TestMod(modxy), items);
+                loadModule(new TestMod(modxy), items);
                 modfocus = changeFocus(modules, modfocus, modules.size()-1);
             }else if(!strcmp(buf,":lurk")){
-                loadModual(new LurkWolf(modxy), items);
+                loadModule(new LurkWolf(modxy), items);
                 modfocus = changeFocus(modules, modfocus, modules.size()-1);
             }
         }else if(buf[0]=='\0'){
@@ -92,6 +92,7 @@ int main(){
           for(int i = 0; i < modules.size(); i++){
               modules[i]->resize(modxy);
           }
+          redrawStatus(status);
         }else{
             modules[modfocus]->sendModInput(buf);
         }

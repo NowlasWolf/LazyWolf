@@ -125,7 +125,7 @@ int changeFocus(std::vector<LazyModule*> list, int cfocus, int newfocus){
     return newfocus;
 }
 
-void loadModual(LazyModule* mod, struct lwItems stuff){
+void loadModule(LazyModule* mod, struct lwItems stuff){
     char buf[100];
     std::vector<LazyModule*> temp = *stuff.modules;
 
